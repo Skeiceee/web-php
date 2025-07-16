@@ -49,8 +49,76 @@
             
         }
 
+
+        public function edit(){
+
+            $title = 'Editar Proyecto';
+
+            $id = $_GET['id'] ?? null;
+
+            if (!$id) {
+                exit('ID is required');
+            }
+
+            $db = new Database();
+            $link = $db->query('SELECT * FROM links WHERE id = ?', [$id])->firstOrFail();
+
+            require __DIR__ . '/../../resources/links-edit.template.php';
+
+        }
+
+        public function update(){
+
+            $validator = new Validator($_POST, [
+                'title' => 'required|min:3|max:255',
+                'url' => 'required|url|max:255',
+                'description' => 'required|min:3|max:500'
+            ]);
+
+            if($validator->passes()) {
+                $db = new Database();
+
+                $db->query('UPDATE links SET title = ?, url = ?, description = ? WHERE id = ?', [
+                    $_POST['title'],
+                    $_POST['url'],
+                    $_POST['description'],
+                    $_POST['id']
+                ]); 
+
+                header('Location: /links');
+                exit;
+            }
+
+            $errors = $validator->errors();
+
+            $id = $_POST['id'] ?? null;
+            
+            if (!$id) {
+                exit('ID is required');
+            }
+
+            $db = new Database();
+            $link = $db->query('SELECT * FROM links WHERE id = ?', [$id])->firstOrFail();
+            
+            $title = 'Editar Proyecto';
+            require __DIR__ . '/../../resources/links-edit.template.php';
+
+        }
+
         public function destroy(){
-            echo 'hola';
+            
+            $id = $_POST['id'] ?? null;
+
+            if (!$id) {
+                exit('ID is required');
+            }
+
+            $db = new Database();
+            $db->query('DELETE FROM links WHERE id = ?', [$id]);
+
+            header('Location: /links');
+            exit;
+
         }
         
     }
