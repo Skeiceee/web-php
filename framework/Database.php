@@ -1,5 +1,7 @@
 <?php
 
+namespace Framework;
+use PDO;
 class Database{
     private $connection;
     private $statment;

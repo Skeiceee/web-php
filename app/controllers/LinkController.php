@@ -1,5 +1,10 @@
 <?php
 
+    namespace App\Controllers;
+
+    use Framework\Database;
+    use Framework\Validator;
+
     class LinkController {
 
         public function index(){
@@ -8,15 +13,20 @@
             
             $db = new Database();
             $links = $db->query('SELECT * FROM links ORDER BY id DESC')->get();
-        
-            require __DIR__ . '/../../resources/links.template.php';
+                    
+            view('links', [
+                'title' => $title,
+                'links' => $links
+            ]);
         }
 
         public function create(){
 
             $title = 'Registrar Proyectos';
-            require __DIR__ . '/../../resources/links-create.template.php';
 
+            view('links-create', [
+                'title' => $title,
+            ]);
         }
 
         public function store(){
@@ -45,8 +55,11 @@
             $errors = $validator->errors();
 
             $title = 'Registrar Proyectos';
-            require __DIR__ . '/../../resources/links-create.template.php';
-            
+
+            view('links-create', [
+                'title' => $title,
+                'errors' => $errors,
+            ]);
         }
 
 
@@ -63,8 +76,10 @@
             $db = new Database();
             $link = $db->query('SELECT * FROM links WHERE id = ?', [$id])->firstOrFail();
 
-            require __DIR__ . '/../../resources/links-edit.template.php';
-
+            view('links-edit', [
+                'title' => $title,
+                'link' => $link,
+            ]);
         }
 
         public function update(){
@@ -101,8 +116,12 @@
             $link = $db->query('SELECT * FROM links WHERE id = ?', [$id])->firstOrFail();
             
             $title = 'Editar Proyecto';
-            require __DIR__ . '/../../resources/links-edit.template.php';
 
+            view('links-edit', [
+                'title' => $title,
+                'link' => $link,
+                'errors' => $errors,
+            ]);
         }
 
         public function destroy(){
