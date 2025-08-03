@@ -41,7 +41,7 @@
                 $_POST['description']
             ]); 
             
-            redirect('/links');
+            redirect('/links/create', 'Proyecto registrado correctamente.');
         }
 
 
@@ -71,6 +71,8 @@
                 'description' => 'required|min:3|max:500'
             ]);
 
+            $link = db()->query('SELECT * FROM links WHERE id = ?', [$_POST['id']])->firstOrFail();
+
             db()->query('UPDATE links SET title = ?, url = ?, description = ? WHERE id = ?', [
                 $_POST['title'],
                 $_POST['url'],
@@ -78,7 +80,7 @@
                 $_POST['id']
             ]); 
 
-            redirect('/links');
+            redirect('/links/edit?id='.$link['id'], 'Proyecto actualizado correctamente.');
 
         }
 

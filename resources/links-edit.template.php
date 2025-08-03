@@ -4,6 +4,8 @@
 </div>
 
 <div class="w-full max-w-xl mx-auto">
+    <?= alert() ?>
+    
     <form action="/links/update" method="POST">
         <input type="hidden" name="_method" value="PUT">        
         <input type="hidden" name="id" value="<?= $link['id'] ?>">

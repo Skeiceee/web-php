@@ -29,4 +29,10 @@ class SessionManager {
     public function remove(string $key): void {
         unset($_SESSION[$key]);
     }
+
+    public static function start(): void {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+    }
 }
