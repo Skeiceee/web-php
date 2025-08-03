@@ -2,7 +2,6 @@
 
     namespace App\Controllers;
 
-    use Framework\Database;
     use Framework\Validator;
 
     class LinkController {
@@ -11,8 +10,7 @@
             
             $title = 'Proyectos';
             
-            $db = new Database();
-            $links = $db->query('SELECT * FROM links ORDER BY id DESC')->get();
+            $links = db()->query('SELECT * FROM links ORDER BY id DESC')->get();
                     
             view('links', [
                 'title' => $title,
@@ -31,35 +29,19 @@
 
         public function store(){
     
-            $validator = new Validator($_POST, [
+            Validator::make($_POST, [
                 'title' => 'required|min:3|max:255',
                 'url' => 'required|url|max:255',
                 'description' => 'required|min:3|max:500'
             ]);
 
-            if($validator->passes()) {
-                // Aquí iría la lógica para guardar el enlace o proyecto
-                // Por ejemplo, insertar en la base de datos
-                $db = new Database();
-
-                $db->query('INSERT INTO links (title, url, description) VALUES (?, ?, ?)', [
-                    $_POST['title'],
-                    $_POST['url'],
-                    $_POST['description']
-                ]); 
-                // Redirigir a una página de éxito o mostrar un mensaje de éxito
-                header('Location: /links');
-                exit;
-            }
-                
-            $errors = $validator->errors();
-
-            $title = 'Registrar Proyectos';
-
-            view('links-create', [
-                'title' => $title,
-                'errors' => $errors,
-            ]);
+            db()->query('INSERT INTO links (title, url, description) VALUES (?, ?, ?)', [
+                $_POST['title'],
+                $_POST['url'],
+                $_POST['description']
+            ]); 
+            
+            redirect('/links');
         }
 
 
@@ -73,8 +55,7 @@
                 exit('ID is required');
             }
 
-            $db = new Database();
-            $link = $db->query('SELECT * FROM links WHERE id = ?', [$id])->firstOrFail();
+            $link = db()->query('SELECT * FROM links WHERE id = ?', [$id])->firstOrFail();
 
             view('links-edit', [
                 'title' => $title,
@@ -84,44 +65,21 @@
 
         public function update(){
 
-            $validator = new Validator($_POST, [
+            Validator::make($_POST, [
                 'title' => 'required|min:3|max:255',
                 'url' => 'required|url|max:255',
                 'description' => 'required|min:3|max:500'
             ]);
 
-            if($validator->passes()) {
-                $db = new Database();
+            db()->query('UPDATE links SET title = ?, url = ?, description = ? WHERE id = ?', [
+                $_POST['title'],
+                $_POST['url'],
+                $_POST['description'],
+                $_POST['id']
+            ]); 
 
-                $db->query('UPDATE links SET title = ?, url = ?, description = ? WHERE id = ?', [
-                    $_POST['title'],
-                    $_POST['url'],
-                    $_POST['description'],
-                    $_POST['id']
-                ]); 
+            redirect('/links');
 
-                header('Location: /links');
-                exit;
-            }
-
-            $errors = $validator->errors();
-
-            $id = $_POST['id'] ?? null;
-            
-            if (!$id) {
-                exit('ID is required');
-            }
-
-            $db = new Database();
-            $link = $db->query('SELECT * FROM links WHERE id = ?', [$id])->firstOrFail();
-            
-            $title = 'Editar Proyecto';
-
-            view('links-edit', [
-                'title' => $title,
-                'link' => $link,
-                'errors' => $errors,
-            ]);
         }
 
         public function destroy(){
@@ -132,11 +90,9 @@
                 exit('ID is required');
             }
 
-            $db = new Database();
-            $db->query('DELETE FROM links WHERE id = ?', [$id]);
+            db()->query('DELETE FROM links WHERE id = ?', [$id]);
 
-            header('Location: /links');
-            exit;
+            redirect('/links');
 
         }
         

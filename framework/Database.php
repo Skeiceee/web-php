@@ -7,9 +7,16 @@ class Database{
     private $statment;
 
     public function __construct() {
-        $dsn = "pgsql:host=localhost;port=5432;dbname=web_php";
+        // $dsn = "pgsql:host=localhost;port=5432;dbname=web_php";
+        $dsn = sprintf(
+            'pgsql:host=%s;port=%d;dbname=%s',
+            config('host'),
+            config('port'),
+            config('dbname')
+        );
+
         try {
-            $this->connection = new PDO($dsn, 'postgres', 'postgres');
+            $this->connection = new PDO($dsn, config('username'), config('password'), config('options', []));
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             echo 'Connection failed: ' . $e->getMessage();
@@ -23,11 +30,15 @@ class Database{
     }
     
     public function get(){
-        return $this->statment->fetchAll(PDO::FETCH_ASSOC);
+        return $this->statment->fetchAll();
+    }
+    
+    public function first() {
+        return $this->statment->fetch();
     }
 
     public function firstOrFail() {
-        $result = $this->statment->fetch(PDO::FETCH_ASSOC);
+        $result = $this->first();
         
         if(!$result){
             exit('No results found');
@@ -35,4 +46,5 @@ class Database{
 
         return $result;
     }
+
 }

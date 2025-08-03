@@ -2,6 +2,8 @@
 
 namespace Framework;
 
+use Framework\Middleware\Middleware;
+
 class Router{
 
     protected $routes = [];
@@ -10,20 +12,32 @@ class Router{
         $this->loadRoutes('web');
     }
 
-    public function get(string $uri, array $action){
-        $this->routes['GET'][$uri] = $action;
+    public function get(string $uri, array $action, string|null $middleware = null){
+        $this->routes['GET'][$uri] = [
+            'action' => $action,
+            'middleware' => $middleware
+        ];
     }
     
-    public function post(string $uri, array $action){
-        $this->routes['POST'][$uri] = $action;
+    public function post(string $uri, array $action, string|null $middleware = null){
+        $this->routes['POST'][$uri] = [
+            'action' => $action,
+            'middleware' => $middleware
+        ];
     }
 
-    public function delete(string $uri, array $action){
-        $this->routes['DELETE'][$uri] = $action;
+    public function delete(string $uri, array $action, string|null $middleware = null){
+        $this->routes['DELETE'][$uri] = [
+            'action' => $action,
+            'middleware' => $middleware
+        ];
     }
 
-    public function put(string $uri, array $action){
-        $this->routes['PUT'][$uri] = $action;
+    public function put(string $uri, array $action, string|null $middleware = null){
+        $this->routes['PUT'][$uri] = [
+            'action' => $action,
+            'middleware' => $middleware
+        ];
     }
 
     public function run(){
@@ -31,7 +45,7 @@ class Router{
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $method = $_POST['_method'] ?? $_SERVER['REQUEST_METHOD'];
 
-        $action = $this->routes[$method][$uri] ?? null;
+        $action = $this->routes[$method][$uri]['action'] ?? null;
 
         // var_dump($this->routes);
         // die();
@@ -39,7 +53,13 @@ class Router{
         if(!$action){
             exit('Route not found'. $method . ' ' . $uri);
         }
-        
+
+        $middleware = $this->routes[$method][$uri]['middleware'] ?? null;
+
+        if($middleware){
+            Middleware::run(new $middleware());
+        }
+
         [$controller, $method] = $action;
 
         (new $controller())->$method();

@@ -12,7 +12,7 @@
             <label class="text-sm font-semibold text-gray-900">Título</label>
             <div class="mt-2">
                 <input type="text" name="title" class="w-full outline-1 outline-gray-300 rounded-md px-3 py-2 text-gray-900"
-                    value="<?= $_POST['title'] ?? $link['title'] ?>">
+                    value="<?= old('title', $link['title']) ?>">
             </div>
         </div>
 
@@ -20,14 +20,14 @@
             <label class="text-sm font-semibold text-gray-900">Url</label>
             <div class="mt-2">
                 <input type="text" name="url" class="w-full outline-1 outline-gray-300 rounded-md px-3 py-2 text-gray-900" 
-                value="<?= $_POST['url'] ?? $link['url'] ?>">
+                value="<?= old('url', $link['url']) ?>">
             </div>
         </div>
 
         <div class="mb-4">
             <label class="text-sm font-semibold text-gray-900">Descripción</label>
             <div class="mt-2">
-                <textarea name="description" rows="2" class="w-full outline-1 outline-gray-300 rounded-md px-4 py-2 text-gray-900"><?= $_POST['description'] ?? $link['description'] ?></textarea>
+                <textarea name="description" rows="2" class="w-full outline-1 outline-gray-300 rounded-md px-4 py-2 text-gray-900"><?= old('description', $link['description']) ?></textarea>
             </div>
         </div>
 
@@ -38,16 +38,7 @@
         </div>
     </form>
 
-    <!-- if errors -->
-    <?php if (!empty($errors)): ?>
-    <ul class="mt-4 text-red-500">
-        <!-- foreach -->
-        <?php foreach ($errors as $error): ?>
-            <li class="text-xs">&rarr; <?= htmlspecialchars($error) ?></li>
-        <?php endforeach; ?>
-        <!-- endforeach -->
-    </ul>
-    <?php endif; ?>
-    <!-- endif -->
+    <?= errors() ?>
+    
 </div>
 <?php require __DIR__ . '/partials/footer.php'; ?>

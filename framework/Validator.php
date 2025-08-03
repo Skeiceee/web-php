@@ -8,9 +8,14 @@ class Validator {
 
     public function __construct(
         protected array $data,
-        protected array $rules = []
+        protected array $rules = [],
+        protected bool $autoRedirect = true
     ){
         $this->validate();
+
+        if ($this->autoRedirect && !$this->passes()) {
+            $this->redirectIfFailed();
+        }
     }
 
     public function validate(): void {
@@ -34,8 +39,9 @@ class Validator {
                     'required' => $this->validateRequired($field, $value),
                     'min' => strlen($value) < $param ? "$field debe tener al menos $param caracteres." : null,
                     'max' => strlen($value) > $param ? "$field no puede exceder los $param caracteres." : null,
-                    'url' => filter_var($value, FILTER_VALIDATE_URL) ? null : "$field debe ser una URL válida.",
-                    default => null,
+                    'url' => filter_var($value, FILTER_VALIDATE_URL) === false ? "$field debe ser una URL válida." : null,
+                    'email' => filter_var($value, FILTER_VALIDATE_EMAIL) === false ? "$field debe ser un correo electrónico válido." : null,
+                    default => throw new \InvalidArgumentException("Regla de validación desconocida: $name"),
                 };
     }
 
@@ -49,6 +55,20 @@ class Validator {
 
     public function errors(): array {
         return $this->errors;
+    }
+
+    public function redirectIfFailed(): void {
+        session()->setFlash('errors', $this->errors);
+
+        foreach ($this->data as $key => $value) {
+            session()->setFlash('old_' . $key, $value);
+        }
+
+        back();
+    }
+
+    public static function make(array $data, array $rules, bool $autoRedirect = true): self {
+        return new self($data, $rules, $autoRedirect);
     }
 
 }
